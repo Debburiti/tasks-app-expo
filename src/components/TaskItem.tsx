@@ -11,10 +11,11 @@ interface TaskItemProps {
 const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
   const deleteTask = useTaskStore((state) => state.deleteTask);
   const setEditingTask = useTaskStore((state) => state.setEditingTask);
+  const setSelectedTaskId = useTaskStore((state) => state.setSelectedTaskId);
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
 
   return (
-    <View style={styles.task}>
+    <TouchableOpacity style={styles.task} onPress={() => setSelectedTaskId(task._id)} activeOpacity={0.8}>
       <View style={styles.contentContainer}>
         <Text style={[styles.text, !!task.completed && styles.textCompleted]}>
           {task.text}
@@ -33,7 +34,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
           <AntDesign name="delete" size={20} color="#fff" style={styles.icon} />
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

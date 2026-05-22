@@ -7,15 +7,19 @@ import TaskList from './src/components/TaskList';
 import { globalStyles } from './src/styles/global';
 import AboutScreen from './src/components/AboutScreen';
 import { useTaskStore } from './src/store/useTaskStore';
+import TaskDetailScreen from './src/screens/TaskDetailScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 export default function App() {
   const tasks = useTaskStore((state) => state.tasks);
   const editingTask = useTaskStore((state) => state.editingTask);
+  const selectedTaskId = useTaskStore((state) => state.selectedTaskId);
   const loadTasks = useTaskStore((state) => state.loadTasks);
   const addTask = useTaskStore((state) => state.addTask);
   const updateTask = useTaskStore((state) => state.updateTask);
   const setEditingTask = useTaskStore((state) => state.setEditingTask);
 
+  const [activeTab, setActiveTab] = useState<'tasks' | 'settings'>('tasks');
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
   const [logoError, setLogoError] = useState(false);
@@ -65,8 +69,19 @@ export default function App() {
     if (selectedDate) setDueDate(selectedDate);
   };
 
+  if (selectedTaskId) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <TaskDetailScreen />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      {activeTab === 'settings' ? (
+        <SettingsScreen />
+      ) : (
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           {logoError ? (
@@ -151,7 +166,7 @@ export default function App() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{isUpdating ? "Editar Tarefa" : "Nova Tarefa"}</Text>
+            <Text style={styles.modalTitle}>{editingTask ? "Editar Tarefa" : "Nova Tarefa"}</Text>
             
             <TextInput
               style={styles.modalInput}
@@ -251,6 +266,17 @@ export default function App() {
       >
         <AboutScreen onClose={() => setAboutModalVisible(false)} />
       </Modal>
+
+      )}
+
+      <View style={styles.tabBar}>
+        <TouchableOpacity style={styles.tabItem} onPress={() => setActiveTab('tasks')}>
+          <Text style={[styles.tabLabel, activeTab === 'tasks' && styles.tabLabelActive]}>My Tasks</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tabItem} onPress={() => setActiveTab('settings')}>
+          <Text style={[styles.tabLabel, activeTab === 'settings' && styles.tabLabelActive]}>Settings</Text>
+        </TouchableOpacity>
+      </View>
 
       <StatusBar style="auto" />
     </SafeAreaView>
@@ -482,6 +508,25 @@ const styles = StyleSheet.create({
   modalSaveText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  tabBar: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    backgroundColor: '#fff',
+  },
+  tabItem: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  tabLabel: {
+    fontSize: 14,
+    color: '#999',
+  },
+  tabLabelActive: {
+    color: '#000',
     fontWeight: 'bold',
   },
 });

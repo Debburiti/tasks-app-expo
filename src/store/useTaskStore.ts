@@ -9,11 +9,13 @@ const baseURL = process.env.EXPO_PUBLIC_API_URL;
 type TaskState = {
   tasks: TaskItem[];
   editingTask: TaskItem | null;
+  selectedTaskId: string | null;
   addTask: (text: string, completed: boolean, dueDate: string | null) => Promise<void>;
   updateTask: (task: TaskItem) => Promise<void>;
   toggleTaskCompleted: (id: string) => void;
   deleteTask: (id: string) => void;
   setEditingTask: (task: TaskItem | null) => void;
+  setSelectedTaskId: (id: string | null) => void;
   loadTasks: () => void;
 };
 
@@ -22,6 +24,7 @@ export const useTaskStore = create<TaskState>()(
     (set, get) => ({
       tasks: [],
       editingTask: null,
+      selectedTaskId: null,
 
       loadTasks: () => {
         axios.get<TaskItem[]>(`${baseURL}`).then(({ data }) => {
@@ -56,6 +59,7 @@ export const useTaskStore = create<TaskState>()(
       },
 
       setEditingTask: (task) => set({ editingTask: task }),
+      setSelectedTaskId: (id) => set({ selectedTaskId: id }),
     }),
     {
       name: 'task-store',
