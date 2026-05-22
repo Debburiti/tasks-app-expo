@@ -157,6 +157,7 @@ export default function App() {
           </View>
         )}
       </View>
+      )}
 
       <Modal
         visible={modalVisible}
@@ -266,8 +267,6 @@ export default function App() {
       >
         <AboutScreen onClose={() => setAboutModalVisible(false)} />
       </Modal>
-
-      )}
 
       <View style={styles.tabBar}>
         <TouchableOpacity style={styles.tabItem} onPress={() => setActiveTab('tasks')}>
