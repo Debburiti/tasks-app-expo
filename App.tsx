@@ -4,18 +4,19 @@ import { StatusBar } from 'expo-status-bar';
 import Checkbox from 'expo-checkbox';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import TaskList from './src/components/TaskList';
-import { addTask, deleteTask, getAllTasks, updateTask, TaskItem } from './src/utils/handle-api';
 import { globalStyles } from './src/styles/global';
 import AboutScreen from './src/components/AboutScreen';
-
-// TODO (Zustand): Importe o seu useTaskStore aqui
+import { useTaskStore } from './src/store/useTaskStore';
 
 export default function App() {
-  // TODO (Zustand): Remova este useState e utilize o seletor da sua store para pegar as tasks
-  const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const tasks = useTaskStore((state) => state.tasks);
+  const editingTask = useTaskStore((state) => state.editingTask);
+  const loadTasks = useTaskStore((state) => state.loadTasks);
+  const addTask = useTaskStore((state) => state.addTask);
+  const updateTask = useTaskStore((state) => state.updateTask);
+  const setEditingTask = useTaskStore((state) => state.setEditingTask);
+
   const [text, setText] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [taskId, setTaskId] = useState("");
   const [loading, setLoading] = useState(true);
   const [logoError, setLogoError] = useState(false);
   const [filter, setFilter] = useState<'all' | 'completed' | 'pending'>('all');
@@ -28,37 +29,34 @@ export default function App() {
   const [priority, setPriority] = useState<'Baixa' | 'Média' | 'Alta'>('Baixa');
 
   useEffect(() => {
-    // TODO (Zustand): Atualize esta chamada para usar a action correspondente da store
-    getAllTasks(setTasks, setLoading);
+    loadTasks();
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (editingTask) {
+      setText(editingTask.text);
+      setCompleted(!!editingTask.completed);
+      setDueDate(editingTask.dueDate ? new Date(editingTask.dueDate) : null);
+      setModalVisible(true);
+    }
+  }, [editingTask]);
 
   const resetForm = () => {
     setText("");
     setCompleted(false);
     setDueDate(null);
     setPriority('Baixa');
-    setIsUpdating(false);
-    setTaskId("");
     setModalVisible(false);
-  };
-
-  const updateMode = (task: TaskItem) => {
-    setIsUpdating(true);
-    setTaskId(task._id);
-    setText(task.text);
-    setCompleted(!!task.completed);
-    setDueDate(task.dueDate ? new Date(task.dueDate) : null);
-    setModalVisible(true);
+    setEditingTask(null);
   };
 
   const handleSave = () => {
     const formattedDate = dueDate ? dueDate.toISOString() : null;
-    if (isUpdating) {
-      // TODO (Zustand): Substitua a chamada abaixo pela action de atualizar da sua store
-      updateTask(taskId, text, completed, formattedDate, setTasks, resetForm);
+    if (editingTask) {
+      updateTask({ ...editingTask, text, completed, dueDate: formattedDate ?? undefined }).then(resetForm);
     } else {
-      // TODO (Zustand): Substitua a chamada abaixo pela action de adicionar da sua store
-      addTask(text, completed, formattedDate, setTasks, resetForm);
+      addTask(text, completed, formattedDate).then(resetForm);
     }
   };
 
@@ -126,8 +124,7 @@ export default function App() {
               styles.deleteButton,
               pressed && styles.deleteButtonPressed
             ]}
-            // TODO (Zustand): Chame a action de deletar todas as tarefas da sua store
-            onPress={() => setTasks([])} 
+              onPress={() => tasks.forEach((t) => useTaskStore.getState().deleteTask(t._id))}
           >
             <Text style={styles.actionButtonText}>Excluir todas</Text>
           </Pressable>
@@ -137,16 +134,7 @@ export default function App() {
           <Button title="Sobre o App" onPress={() => setAboutModalVisible(true)} />
         </View>
 
-        {/* TODO (Zustand): Remova as props tasks, onUpdate e onDelete após refatorar o TaskList */}
-        <TaskList 
-          tasks={tasks.filter(t => {
-            if (filter === 'completed') return t.completed;
-            if (filter === 'pending') return !t.completed;
-            return true;
-          })} 
-          onUpdate={updateMode} 
-          onDelete={(id) => deleteTask(id, setTasks)} 
-        />
+        <TaskList filter={filter} />
 
         {loading && (
           <View style={styles.loaderContainer}>
