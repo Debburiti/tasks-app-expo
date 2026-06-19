@@ -1,6 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather, AntDesign } from '@expo/vector-icons';
+import {
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  Button,
+  ButtonText,
+  Heading,
+} from '@gluestack-ui/themed';
 import { TaskItem as TaskType } from '../utils/handle-api';
 import { useTaskStore } from '../store/useTaskStore';
 
@@ -12,29 +23,57 @@ const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
   const deleteTask = useTaskStore((state) => state.deleteTask);
   const setEditingTask = useTaskStore((state) => state.setEditingTask);
   const setSelectedTaskId = useTaskStore((state) => state.setSelectedTaskId);
+  const [showAlert, setShowAlert] = useState(false);
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
 
+  const handleConfirmDelete = () => {
+    setShowAlert(false);
+    deleteTask(task._id);
+  };
+
   return (
-    <TouchableOpacity style={styles.task} onPress={() => setSelectedTaskId(task._id)} activeOpacity={0.8}>
-      <View style={styles.contentContainer}>
-        <Text style={[styles.text, !!task.completed && styles.textCompleted]}>
-          {task.text}
-        </Text>
-        {task.dueDate && (
-          <Text style={[styles.dateText, isOverdue ? styles.dateOverdue : styles.dateOnTime]}>
-            Até: {new Date(task.dueDate).toLocaleDateString()}
+    <>
+      <TouchableOpacity style={styles.task} onPress={() => setSelectedTaskId(task._id)} activeOpacity={0.8}>
+        <View style={styles.contentContainer}>
+          <Text style={[styles.text, !!task.completed && styles.textCompleted]}>
+            {task.text}
           </Text>
-        )}
-      </View>
-      <View style={styles.icons}>
-        <TouchableOpacity onPress={() => setEditingTask(task)} accessibilityRole="button">
-          <Feather name="edit" size={20} color="#fff" style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => deleteTask(task._id)} accessibilityRole="button">
-          <AntDesign name="delete" size={20} color="#fff" style={styles.icon} />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+          {task.dueDate && (
+            <Text style={[styles.dateText, isOverdue ? styles.dateOverdue : styles.dateOnTime]}>
+              Até: {new Date(task.dueDate).toLocaleDateString()}
+            </Text>
+          )}
+        </View>
+        <View style={styles.icons}>
+          <TouchableOpacity onPress={() => setEditingTask(task)} accessibilityRole="button">
+            <Feather name="edit" size={20} color="#fff" style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowAlert(true)} accessibilityRole="button">
+            <AntDesign name="delete" size={20} color="#fff" style={styles.icon} />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+
+      <AlertDialog isOpen={showAlert} onClose={() => setShowAlert(false)}>
+        <AlertDialogBackdrop />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <Heading>Excluir tarefa</Heading>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <Text>Tem certeza que deseja excluir esta tarefa?</Text>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <Button variant="outline" onPress={() => setShowAlert(false)}>
+              <ButtonText>Cancelar</ButtonText>
+            </Button>
+            <Button action="negative" onPress={handleConfirmDelete}>
+              <ButtonText>Excluir</ButtonText>
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
