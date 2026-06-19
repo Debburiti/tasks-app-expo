@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Feather, AntDesign } from '@expo/vector-icons';
 
 interface TaskProps {
@@ -10,44 +10,18 @@ interface TaskProps {
 
 const Task: React.FC<TaskProps> = ({ text, updateMode, deleteTask }) => {
   return (
-    <View style={styles.todo}>
-      <Text style={styles.text}>{text}</Text>
-      <View style={styles.icons}>
+    <View className="bg-white rounded-xl shadow-md p-5 mt-4 flex-row items-center justify-between">
+      <Text className="text-gray-800 text-base flex-1">{text}</Text>
+      <View className="flex-row gap-4 ml-4">
         <TouchableOpacity onPress={updateMode}>
-          <Feather name="edit" size={20} color="#fff" style={styles.icon} />
+          <Feather name="edit" size={20} color="#374151" />
         </TouchableOpacity>
         <TouchableOpacity onPress={deleteTask}>
-          <AntDesign name="delete" size={20} color="#fff" style={styles.icon} />
+          <AntDesign name="delete" size={20} color="#ef4444" />
         </TouchableOpacity>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  todo: {
-    backgroundColor: '#000',
-    paddingVertical: 24,
-    paddingHorizontal: 32, // Adjusted from rem
-    borderRadius: 5,
-    marginTop: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  text: {
-    color: '#fff',
-    fontSize: 16,
-    flex: 1,
-  },
-  icons: {
-    flexDirection: 'row',
-    gap: 16,
-    marginLeft: 16,
-  },
-  icon: {
-    padding: 2,
-  },
-});
 
 export default Task;
