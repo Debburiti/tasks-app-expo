@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { SectionList, StyleSheet, View, Text } from 'react-native';
 import TaskItem from './TaskItem';
+import EmptyState from './EmptyState';
 import { useTaskStore } from '../store/useTaskStore';
 
 interface TaskListProps {
@@ -22,6 +23,10 @@ const TaskList: React.FC<TaskListProps> = ({ filter }) => {
       { title: '📋 Pendentes', data: filtered.filter((t) => !t.completed) },
     ];
   }, [tasks, filter]);
+
+  if (tasks.length === 0) {
+    return <EmptyState />;
+  }
 
   return (
     <View style={styles.listContainer}>
