@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, Platform, Image, Pressable, ActivityIndicator, Modal, Button } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Platform, Image, Pressable, ActivityIndicator, Modal, Button } from 'react-native';
+import { Input, InputField, Button as GluestackButton, ButtonText } from '@gluestack-ui/themed';
 import { StatusBar } from 'expo-status-bar';
 import Checkbox from 'expo-checkbox';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -122,16 +123,9 @@ export default function App() {
         </View>
 
         <View style={styles.actionButtonsContainer}>
-          <Pressable 
-            style={({ pressed }) => [
-              styles.actionButton,
-              styles.actionButtonAdd,
-              pressed && styles.actionButtonAddPressed
-            ]}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={styles.actionButtonText}>Nova Tarefa</Text>
-          </Pressable>
+          <GluestackButton onPress={() => setModalVisible(true)} style={styles.actionButton}>
+            <ButtonText>Nova Tarefa</ButtonText>
+          </GluestackButton>
 
           <Pressable 
             style={({ pressed }) => [
@@ -169,13 +163,14 @@ export default function App() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{editingTask ? "Editar Tarefa" : "Nova Tarefa"}</Text>
             
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Nome da tarefa..."
-              value={text}
-              maxLength={50}
-              onChangeText={setText}
-            />
+            <Input style={styles.modalInput}>
+              <InputField
+                placeholder="Nome da tarefa..."
+                value={text}
+                maxLength={50}
+                onChangeText={setText}
+              />
+            </Input>
 
             <View style={styles.fieldRow}>
               <Text style={styles.fieldLabel}>Data limite:</Text>
