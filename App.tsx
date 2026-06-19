@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, Platform, StatusBar as RNStatusBar, Image, Pressable, ActivityIndicator, Modal, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, Platform, Image, Pressable, ActivityIndicator, Modal, Button } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Checkbox from 'expo-checkbox';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -71,14 +71,14 @@ export default function App() {
 
   if (selectedTaskId) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView className="flex-1 bg-gray-100">
         <TaskDetailScreen />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView className="flex-1 bg-gray-100">
       {activeTab === 'settings' ? (
         <SettingsScreen />
       ) : (
@@ -283,11 +283,6 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: globalStyles.backgroundColor,
-    paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0,
-  },
   container: {
     flex: 1,
     maxWidth: 600,
